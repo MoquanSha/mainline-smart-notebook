@@ -1,0 +1,56 @@
+{
+  "type": "object",
+  "properties": {
+    "date": { "type": "string" },
+    "daySummary": { "type": "string" },
+    "periods": {
+      "type": "array",
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "properties": {
+          "startTime": { "type": "string" },
+          "endTime": { "type": "string" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["completed", "in_progress", "blocked"]
+          },
+          "outcomes": {
+            "type": "array",
+            "maxItems": 5,
+            "items": { "type": "string" }
+          },
+          "remaining": {
+            "type": "array",
+            "maxItems": 4,
+            "items": { "type": "string" }
+          },
+          "sourceEventIds": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "sourceCaptureIds": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": [
+          "startTime",
+          "endTime",
+          "title",
+          "summary",
+          "status",
+          "outcomes",
+          "remaining",
+          "sourceEventIds",
+          "sourceCaptureIds"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["date", "daySummary", "periods"],
+  "additionalProperties": false
+}

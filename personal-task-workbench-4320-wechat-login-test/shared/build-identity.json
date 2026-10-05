@@ -1,0 +1,10 @@
+{
+  "releaseSet": "reliability-20260925.3",
+  "version": "1.1.63-reliability.3",
+  "miniVersion": "0.10.44",
+  "productName": "主线笔记可靠性测试版",
+  "appId": "com.shamoquan.mainline-smart-notebook.reliability-test",
+  "dataFolder": "mainline-smart-notebook-reliability-test",
+  "backendPort": 4430,
+  "devPort": 4431
+}

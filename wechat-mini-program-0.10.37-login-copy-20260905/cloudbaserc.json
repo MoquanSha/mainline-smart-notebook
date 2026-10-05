@@ -1,0 +1,61 @@
+{
+  "$schema": "https://static.cloudbase.net/cli/cloudbaserc.schema.json",
+  "version": "2.0",
+  "envId": "YOUR_CLOUDBASE_ENV_ID",
+  "functionRoot": "cloudfunctions",
+  "functions": [
+    {
+      "name": "notebookApi",
+      "runtime": "Nodejs20.19",
+      "handler": "index.main",
+      "timeout": 120,
+      "memorySize": 512,
+      "envVariables": {
+        "AUTO_CREATE_COLLECTIONS": "false",
+        "ENABLE_ORDERED_SYNC": "true",
+        "ORDERED_SYNC_INDEXES_VERIFIED": "true"
+      },
+      "description": "Mainline notebook mini-program API"
+    },
+    {
+      "name": "desktopSync",
+      "type": "HTTP",
+      "runtime": "Nodejs20.19",
+      "handler": "index.main",
+      "timeout": 120,
+      "memorySize": 512,
+      "envVariables": {
+        "ENABLE_ORDERED_SYNC": "true",
+        "ORDERED_SYNC_INDEXES_VERIFIED": "true"
+      },
+      "description": "Mainline notebook desktop HTTPS sync"
+    },
+    {
+      "name": "miniQrCode",
+      "runtime": "Nodejs20.19",
+      "handler": "index.main",
+      "timeout": 60,
+      "memorySize": 256,
+      "description": "Generate a WeChat mini-program QR code for desktop login"
+    },
+    {
+      "name": "wechatWebhook",
+      "type": "HTTP",
+      "runtime": "Nodejs20.19",
+      "handler": "index.main",
+      "timeout": 30,
+      "memorySize": 256,
+      "description": "WeChat official account capture and identity binding webhook"
+    },
+    {
+      "name": "wechatKfWebhook",
+      "type": "HTTP",
+      "runtime": "Nodejs20.19",
+      "handler": "index.main",
+      "timeout": 60,
+      "memorySize": 256,
+      "description": "WeChat Customer Service message sync and notebook bridge"
+    }
+  ]
+}
+

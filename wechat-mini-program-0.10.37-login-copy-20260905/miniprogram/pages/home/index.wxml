@@ -1,0 +1,165 @@
+<view class="page today-todo-page {{onboardingRequired ? 'is-onboarding' : ''}}">
+  <view class="todo-hero">
+    <view class="eyebrow todo-eyebrow">今日待办</view>
+    <view class="todo-title-row">
+      <view class="todo-title">今天要完成什么</view>
+      <view class="hero-actions">
+        <view wx:if="{{pendingCount}}" class="pending-count" bindtap="goInbox">{{pendingCount}} 项待确认</view>
+        <view class="header-sync {{syncingComputer ? 'is-syncing' : ''}}" role="button" bindtap="syncComputer">{{syncingComputer ? '同步中' : '同步'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{account}}" class="workspace-strip" bindtap="goAccount">
+    <view class="workspace-copy">
+      <text class="workspace-name">{{activeWorkspace ? activeWorkspace.name : '当前工作区'}}</text>
+      <text class="workspace-role">{{account.role === 'owner' ? '所有者' : account.role === 'admin' ? '管理员' : '成员'}}</text>
+    </view>
+    <text class="workspace-action">成员与设置 ›</text>
+  </view>
+
+  <view wx:if="{{onboardingRequired}}" class="onboarding-card">
+    <view class="onboarding-title">加入多人内测</view>
+    <view class="onboarding-copy">这个微信账号还没有加入工作区，请使用邀请人发给你的邀请码。</view>
+    <button class="primary-button onboarding-button" bindtap="goAccount">输入邀请码</button>
+  </view>
+
+  <view class="todo-composer">
+    <view class="input-kicker input-kicker-blue"><view class="input-kicker-mark"></view><text>添加待办</text></view>
+    <textarea class="todo-input" value="{{draft}}" maxlength="4000" placeholder="把今天要做的事情都写进来，可以是一大段，也可以分行写……" bindinput="onInput" />
+    <view class="todo-compose-bottom">
+      <picker mode="date" value="{{targetDate}}" start="{{todayDate}}" bindchange="onTargetDateChange"><view class="todo-date-picker">{{targetDate === todayDate ? '加入今天' : '预约 ' + targetDate}}</view></picker>
+      <button class="primary-button todo-add" bindtap="addTodo">{{saving ? '正在保存' : targetDate === todayDate ? '整理并加入' : '预约待办'}}</button>
+    </view>
+  </view>
+  <view class="todo-hint">一段话可以拆成多项。预约后会提前同步，并在指定日期自动出现。</view>
+
+  <view class="assistant-entry {{openingAssistant ? 'is-opening' : ''}}" role="button" bindtap="openAssistant">
+    <view class="assistant-mark"><view class="assistant-bubble"></view><view class="assistant-spark">✦</view></view>
+    <view class="assistant-copy">
+      <view class="assistant-title-row"><view class="assistant-title">微信里和主线笔记助手聊天</view><view class="assistant-beta">内测中</view></view>
+      <view class="assistant-note">服务号完成注册关联后开放</view>
+    </view>
+    <view class="assistant-arrow">›</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="todo-empty">正在读取今天的待办……</view>
+  <view wx:elif="{{todos.length}}" class="todo-list">
+    <view wx:for="{{todos}}" wx:key="id" class="todo-card {{item.priority === 'high' ? 'is-urgent' : ''}} {{item.pinned ? 'is-pinned' : ''}} {{draggingTodoId === item.id ? 'is-dragging' : ''}} {{dragTargetTodoId === item.id ? 'is-drag-target' : ''}}">
+      <view class="todo-main-row">
+        <view
+          class="todo-drag-handle"
+          role="button"
+          aria-label="长按拖动排序"
+          data-id="{{item.id}}"
+          bindlongpress="startTodoDrag"
+          catchtouchmove="moveTodoDrag"
+          catchtouchend="finishTodoDrag"
+          catchtouchcancel="cancelTodoDrag"
+        >⠿</view>
+        <view class="todo-check" role="button" aria-label="完成待办" data-id="{{item.id}}" data-version="{{item.version}}" data-action="complete" bindtap="mutate">
+          <view class="todo-check-box"></view>
+        </view>
+        <view class="todo-copy">
+          <view class="todo-meta"><text class="today-label">{{item.meta}}</text><text wx:if="{{item.carriedLabel}}" class="carry-label">{{item.carriedLabel}}</text><text wx:if="{{item.priorityLabel}}" class="priority-label">{{item.priorityLabel}}</text></view>
+          <view class="todo-name">{{item.title}}</view>
+          <view wx:if="{{item.hasDetail}}" class="todo-detail">{{item.description}}</view>
+        </view>
+        <view class="pin-corner {{item.pinned ? 'active' : ''}}" role="button" aria-label="{{item.pinned ? '取消置顶' : '置顶'}}" data-id="{{item.id}}" data-version="{{item.version}}" data-pinned="{{item.pinned}}" bindtap="setPin"><view class="pin-icon"><view class="pin-icon-head"></view><view class="pin-icon-stem"></view></view><text>{{item.pinned ? '取消' : '置顶'}}</text></view>
+        <view class="todo-actions">
+          <view class="todo-action defer-action" role="button" aria-label="顺延到明天" data-id="{{item.id}}" data-version="{{item.version}}" data-action="defer" bindtap="mutate">明天</view>
+          <view class="todo-action is-remove" role="button" aria-label="移到垃圾箱" data-id="{{item.id}}" data-version="{{item.version}}" data-action="delete" bindtap="mutate">移除</view>
+        </view>
+      </view>
+      <view class="comment-toggle" data-id="{{item.id}}" bindtap="toggleComments"><text>{{item.commentLabel}}</text><text>{{openComments[item.id] ? '收起' : '展开'}}</text></view>
+      <view wx:if="{{openComments[item.id]}}" class="comment-panel">
+        <view wx:for="{{item.comments}}" wx:for-item="comment" wx:key="id" class="comment-item">
+          <view class="comment-head"><text>{{comment.createdLabel}}<text wx:if="{{comment.pending}}" class="comment-pending"> · 等待上传确认</text></text><button wx:if="{{!comment.pending}}" class="comment-delete" data-id="{{item.id}}" data-version="{{item.version}}" data-comment-id="{{comment.id}}" bindtap="deleteComment">删除</button></view>
+          <view wx:if="{{comment.content}}" class="comment-content">{{comment.content}}</view>
+          <photo-gallery wx:if="{{comment.attachments.length}}" todo-id="{{item.id}}" attachments="{{comment.attachments}}" scope="{{photoScope}}" />
+        </view>
+        <textarea class="comment-input" value="{{commentDrafts[item.id]}}" maxlength="5000" placeholder="记录进展、问题或下一步……" data-id="{{item.id}}" bindinput="onCommentInput" />
+        <view wx:if="{{commentImages[item.id] && commentImages[item.id].length}}" class="pending-gallery"><view wx:for="{{commentImages[item.id]}}" wx:for-item="image" wx:key="id" class="pending-image-wrap"><image class="pending-image" src="{{image.filePath}}" mode="aspectFill"/><button class="pending-remove" data-id="{{item.id}}" data-image-id="{{image.id}}" bindtap="removePendingImage">×</button></view></view>
+        <view wx:if="{{commentSubmissions[item.id] && !commentSaving[item.id]}}" class="comment-retry-hint">上一条笔记尚未确认保存，请重试。当前新输入的内容会保留。</view>
+        <view class="comment-composer-actions"><button class="image-button" data-id="{{item.id}}" bindtap="chooseCommentImages">图片 {{commentImages[item.id] ? commentImages[item.id].length : 0}}/6</button><button class="comment-submit" data-id="{{item.id}}" data-version="{{item.version}}" bindtap="addComment">{{commentSaving[item.id] ? '正在保存' : commentSubmissions[item.id] ? '重试上一条' : '保存笔记'}}</button></view>
+      </view>
+    </view>
+  </view>
+  <view wx:else class="todo-empty"><view>今天的待办已经清空</view><button class="quiet-button" bindtap="goJournal">去灵光一现记录新事情</button></view>
+
+  <view wx:if="{{scheduled.length}}" class="scheduled-section">
+    <view class="scheduled-head"><text>已预约</text><text>{{scheduled.length}} 项</text></view>
+    <view class="scheduled-list"><view wx:for="{{scheduled}}" wx:key="id" class="scheduled-row"><view class="scheduled-date">{{item.scheduledLabel}}</view><view class="scheduled-copy"><text>{{item.title}}</text><text class="record-dates">{{item.dateMeta}}</text></view></view></view>
+  </view>
+
+  <view wx:if="{{completed.length}}" class="completed-section">
+    <view class="completed-head" bindtap="toggleCompleted"><text>今天已完成 {{completed.length}} 项</text><text>{{showCompleted ? '收起' : '展开'}}</text></view>
+    <view wx:if="{{showCompleted}}" class="completed-list"><view wx:for="{{completed}}" wx:key="id" class="completed-row"><image class="completed-mark" src="/assets/tabbar/check-selected.png" mode="aspectFit" /><view class="completed-copy"><view><text class="completed-title">{{item.title}}</text><text class="record-dates">{{item.dateMeta}}</text></view><view class="completed-actions"><text wx:if="{{item.commentCount}}" class="completed-comment-count">{{item.commentCount}} 条笔记</text><view class="reopen-action" role="button" data-id="{{item.id}}" data-version="{{item.version}}" bindtap="reopenTodo">撤回完成</view></view></view></view></view>
+  </view>
+
+  <view class="completion-search">
+    <view class="completion-search-head"><view><text class="completion-search-title">完成记录</text><text class="completion-search-note">默认显示全部，灰色日期没有完成记录</text></view><button class="completion-all {{!completedQueryDate ? 'is-active' : ''}}" bindtap="clearCompletionDate">查看全部 {{completionHistory.length}} 项</button></view>
+    <view class="completion-calendar-toggle {{completionCalendarOpen ? 'is-open' : ''}}" role="button" aria-expanded="{{completionCalendarOpen}}" bindtap="toggleCompletionCalendar"><view><text class="completion-calendar-icon">◷</text><text>{{completedQueryDate ? '已选择 ' + completedQueryDate : '按完成日期筛选'}}</text></view><view><text>{{completionCalendarOpen ? '收起日期' : '展开选择'}}</text><text class="completion-calendar-caret">⌄</text></view></view>
+    <view wx:if="{{completionCalendarOpen}}" class="completion-calendar">
+      <view class="completion-calendar-nav"><button disabled="{{!completionCanPrevious}}" data-offset="-1" bindtap="shiftCompletionMonth">‹</button><text>{{completionMonthLabel}}</text><button disabled="{{!completionCanNext}}" data-offset="1" bindtap="shiftCompletionMonth">›</button></view>
+      <view class="completion-weekdays"><text wx:for="{{completionWeekdays}}" wx:key="*this">{{item}}</text></view>
+      <view class="completion-calendar-grid"><view wx:for="{{completionCalendar}}" wx:key="key" class="completion-day {{item.empty ? 'is-empty' : ''}} {{!item.empty && !item.enabled ? 'is-disabled' : ''}} {{item.selected ? 'is-selected' : ''}}" role="button" aria-disabled="{{!item.enabled}}" data-date="{{item.date}}" bindtap="selectCompletionDate">{{item.day}}</view></view>
+    </view>
+    <view wx:if="{{completedLoading}}" class="completion-empty">正在读取……</view>
+    <view wx:else>
+      <view wx:if="{{completedQueryDate}}" class="completion-filter-note">当前只看 {{completedQueryDate}}，共 {{completedResults.length}} 项</view>
+      <scroll-view wx:if="{{completedResults.length}}" scroll-y class="completion-results">
+        <view wx:for="{{completedResults}}" wx:key="id" class="completion-result">
+          <image class="completed-mark" src="/assets/tabbar/check-selected.png" mode="aspectFit"/>
+          <view class="completion-result-copy">
+            <text class="completion-name">{{item.title}}</text>
+            <text class="record-dates">{{item.dateMeta}}</text>
+            <view wx:if="{{item.photoAttachments.length && !openCompletionNotes[item.id]}}" class="completion-photo-preview">
+              <photo-gallery todo-id="{{item.id}}" attachments="{{item.photoAttachments}}" scope="{{photoScope}}" compact />
+            </view>
+            <view wx:if="{{item.comments.length}}" class="completion-note-toggle" role="button" data-id="{{item.id}}" bindtap="toggleCompletionNotes"><text>笔记 {{item.comments.length}} 条</text><text>{{openCompletionNotes[item.id] ? '收起' : '展开'}}</text></view>
+            <view wx:if="{{item.comments.length && openCompletionNotes[item.id]}}" class="completion-notes">
+              <view wx:for="{{item.comments}}" wx:for-item="note" wx:key="id" class="completion-note">
+                <view class="completion-note-head"><text>{{note.createdLabel}}</text><text>{{note.organizationLabel}}</text></view>
+                <text wx:if="{{note.content}}" class="completion-note-content">{{note.content}}</text>
+                <photo-gallery wx:if="{{note.attachments.length}}" todo-id="{{item.id}}" attachments="{{note.attachments}}" scope="{{photoScope}}" compact />
+              </view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      <view wx:else class="completion-empty">还没有已完成的待办</view>
+    </view>
+  </view>
+
+  <view wx:if="{{history.length}}" class="history-section">
+    <view class="completed-head" bindtap="toggleHistory"><text>过去 14 天</text><text>{{showHistory ? '收起' : '展开'}}</text></view>
+    <view wx:if="{{showHistory}}" class="history-list">
+      <view wx:for="{{history}}" wx:key="date" class="history-day">
+        <view class="history-date">{{item.date}}</view>
+        <view wx:for="{{item.todos}}" wx:for-item="todo" wx:key="id" class="history-row">
+          <view class="history-summary">
+            <text class="history-status">{{todo.status === 'done' ? '已完成' : todo.status === 'postponed' ? '已顺延' : '未完成'}}</text>
+            <text class="history-title">{{todo.title}}</text>
+            <view wx:if="{{todo.commentCount}}" class="history-comments" role="button" data-id="{{todo.id}}" bindtap="toggleHistoryNotes">{{todo.commentCount}} 条笔记 · {{openHistoryNotes[todo.id] ? '收起' : '展开'}}</view>
+          </view>
+          <view wx:if="{{todo.photoAttachments.length && !openHistoryNotes[todo.id]}}" class="history-photo-preview">
+            <photo-gallery todo-id="{{todo.id}}" attachments="{{todo.photoAttachments}}" scope="{{photoScope}}" compact />
+          </view>
+          <view wx:if="{{todo.comments.length && openHistoryNotes[todo.id]}}" class="completion-notes history-notes">
+            <view wx:for="{{todo.comments}}" wx:for-item="note" wx:key="id" class="completion-note">
+              <view class="completion-note-head"><text>{{note.createdLabel}}</text><text>{{note.organizationLabel}}</text></view>
+              <text wx:if="{{note.content}}" class="completion-note-content">{{note.content}}</text>
+              <photo-gallery wx:if="{{note.attachments.length}}" todo-id="{{todo.id}}" attachments="{{note.attachments}}" scope="{{photoScope}}" compact />
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="todo-footer">
+    <view class="sync-status"><text class="sync-dot {{syncTone}}"></text><text>{{syncMessage}}</text></view>
+    <view class="footer-actions"><view class="plain-action" role="button" bindtap="goJournal">灵光一现</view></view>
+  </view>
+</view>

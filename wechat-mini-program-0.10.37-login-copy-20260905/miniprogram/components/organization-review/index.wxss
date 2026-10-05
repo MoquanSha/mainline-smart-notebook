@@ -1,0 +1,9 @@
+.review { margin: 20rpx 0; }
+.action { margin: 0; padding: 10rpx 16rpx; font-size: 25rpx; line-height: 1.5; color: #594c34; background: #f8f1e4; border-radius: 12rpx; }
+.action::after { border: 0; }
+.panel { margin-top: 16rpx; padding: 20rpx; border: 1rpx solid #dfcda7; border-radius: 18rpx; background: #fffaf0; }
+.hint, .finding { margin: 12rpx 0; font-size: 25rpx; line-height: 1.65; color: #635d51; overflow-wrap: anywhere; }
+.label { margin: 22rpx 0 12rpx; font-size: 27rpx; font-weight: 600; }
+.copy { display: block; padding: 18rpx; border-radius: 12rpx; white-space: pre-wrap; word-break: break-all; background: #fff; color: #34332f; font-size: 27rpx; line-height: 1.75; }
+.pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12rpx; margin-top: 20rpx; font-size: 23rpx; }
+.error { color: #9e3628; font-size: 25rpx; }

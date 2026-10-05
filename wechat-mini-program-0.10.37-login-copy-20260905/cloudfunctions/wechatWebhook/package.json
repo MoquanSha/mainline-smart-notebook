@@ -1,0 +1,9 @@
+{
+  "name": "wechat-webhook",
+  "version": "0.7.0",
+  "private": true,
+  "main": "index.js",
+  "dependencies": {
+    "@cloudbase/node-sdk": "^3.18.3"
+  }
+}

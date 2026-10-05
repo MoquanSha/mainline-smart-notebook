@@ -1,0 +1,4 @@
+{
+  "desc": "主线笔记页面索引",
+  "rules": [{ "action": "disallow", "page": "*" }]
+}

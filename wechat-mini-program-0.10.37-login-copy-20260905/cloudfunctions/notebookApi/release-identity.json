@@ -1,0 +1,9 @@
+{
+  "releaseSet": "reliability-20260925.3",
+  "desktopVersion": "1.1.63-reliability.3",
+  "miniVersion": "0.10.44",
+  "backend": {
+    "notebookApi": "0.7.0",
+    "desktopSync": "0.4.0"
+  }
+}

@@ -1,0 +1,4 @@
+.markdown-view{font-size:inherit;line-height:1.7;overflow-wrap:anywhere;white-space:normal;min-width:0}
+.markdown-links{display:flex;flex-wrap:wrap;gap:10rpx;margin-top:12rpx}
+.markdown-link{width:auto;max-width:100%;margin:0;padding:6rpx 12rpx;border:1rpx solid #dfe2eb;border-radius:8rpx;background:transparent;color:#4f62d2;font-size:22rpx;line-height:1.6;white-space:normal;overflow-wrap:anywhere;text-align:left}
+.markdown-link::after{border:0}

@@ -1,0 +1,54 @@
+{
+  "pages": [
+    "pages/onboarding/index",
+    "pages/home/index",
+    "pages/capture/index",
+    "pages/inbox/index",
+    "pages/tasks/index",
+    "pages/archive/index",
+    "pages/account/index",
+    "pages/timeline/index",
+    "pages/records/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "主线笔记",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#ffffff",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#747782",
+    "selectedColor": "#5367d9",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "今日待办",
+        "iconPath": "assets/tabbar/home.png",
+        "selectedIconPath": "assets/tabbar/home-selected.png"
+      },
+      {
+        "pagePath": "pages/capture/index",
+        "text": "灵光一现",
+        "iconPath": "assets/tabbar/capture.png",
+        "selectedIconPath": "assets/tabbar/capture-selected.png"
+      },
+      {
+        "pagePath": "pages/tasks/index",
+        "text": "今日小记",
+        "iconPath": "assets/tabbar/tasks.png",
+        "selectedIconPath": "assets/tabbar/tasks-selected.png"
+      },
+      {
+        "pagePath": "pages/archive/index",
+        "text": "数据档案",
+        "iconPath": "assets/tabbar/records.png",
+        "selectedIconPath": "assets/tabbar/records-selected.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

@@ -1,0 +1,128 @@
+<view class="page diary-page">
+  <view class="page-header diary-header">
+    <view class="header-copy">
+      <view class="eyebrow">{{todayDateLabel}}</view>
+      <view class="title">今日小记</view>
+      <view class="subtitle">记下经历、感悟和想法，待办变化作为补充。</view>
+    </view>
+    <button class="header-action diary-refresh" loading="{{refreshingDiary}}" disabled="{{refreshingDiary}}" bindtap="refreshDiary">DeepSeek 更新</button>
+  </view>
+
+  <view class="diary-input-card">
+    <view class="diary-input-head">
+      <view><view class="diary-input-title">今天的日记与感悟</view><view class="diary-input-hint">原文会完整保留，AI 整理稿以这里的内容为主。</view></view>
+      <view wx:if="{{diaryManualInputs.length}}" class="diary-input-count">已保存 {{diaryManualInputs.length}} 条</view>
+    </view>
+    <view wx:if="{{diaryInput && diaryDraftDate !== todayDate}}" class="diary-input-hint">这份草稿会保存到 {{diaryDraftDate}}，保留开始记录时的日期。</view>
+    <textarea class="diary-input" maxlength="-1" auto-height value="{{diaryInput}}" placeholder="写下今天的经历、感受、想法，也可以保留不确定的部分……" bindinput="onDiaryInput" />
+    <button class="diary-input-submit" loading="{{organizingDiaryInput}}" disabled="{{!diaryInput || organizingDiaryInput}}" bindtap="organizeDiaryInput">保存原文并整理</button>
+    <view wx:if="{{syncVisible}}" class="diary-sync diary-sync-{{syncTone}}"><view class="diary-sync-dot"></view><text>{{syncMessage}}</text></view>
+    <view wx:if="{{diaryManualInputs.length}}" class="manual-input-fold" bindtap="toggleManualInputs">
+      <view>今天直接输入的原文</view><view class="manual-input-action">{{showManualInputs ? '收起' : '展开'}}</view>
+    </view>
+    <scroll-view wx:if="{{showManualInputs}}" scroll-y class="manual-input-scroll" enhanced show-scrollbar>
+      <view wx:for="{{diaryManualInputs}}" wx:key="id" class="manual-input-row">
+        <view>{{item.content}}</view><text class="manual-input-meta">{{item.time}} · {{item.pending ? '本机已保存，等待上传' : '云端已确认原文'}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="diary-lead-card">
+    <organization-review kind="daily_diary" date="{{todayDate}}" job="{{diaryReviewJob}}" scope="{{reviewScope}}" />
+    <view class="diary-card-head">
+      <view class="diary-card-title">一眼看完今天</view>
+      <view class="diary-save-state">{{diaryUpdatedLabel}} · {{diarySourceLabel}}</view>
+    </view>
+    <view class="diary-summary">
+      <markdown-view nodes="{{diarySummaryNodes}}" />
+    </view>
+    <view class="diary-stats" aria-label="今日变化统计">
+      <view class="diary-stat"><text>{{diaryStats.newTodos}}</text><view>条新待办</view></view>
+      <view class="diary-stat"><text>{{diaryStats.completed}}</text><view>条实际完成</view></view>
+      <view class="diary-stat"><text>{{diaryStats.notes}}</text><view>条待办笔记</view></view>
+      <view class="diary-stat"><text>{{diaryStats.journals}}</text><view>条灵光一现</view></view>
+    </view>
+  </view>
+
+  <view class="diary-section-card">
+    <view class="diary-section-head"><view class="diary-section-title">今天主要做了这些</view><view>{{diaryPeriods.length}} 项</view></view>
+    <view wx:if="{{!diaryPeriods.length}}" class="diary-empty">电脑端或手机端形成明确成果后，会在这里显示。</view>
+    <view wx:for="{{diaryPeriods}}" wx:key="id" class="diary-period period-{{item.status}}">
+      <view class="period-rail"></view>
+      <view class="period-body">
+        <view class="period-top"><view class="period-title">{{item.title}}</view><view class="period-status">{{item.statusLabel}}</view></view>
+        <view wx:if="{{item.timeRange}}" class="period-time">{{item.timeRange}}</view>
+        <view wx:if="{{item.summary}}" class="period-summary">{{item.summary}}</view>
+        <view wx:if="{{item.outcomes.length}}" class="period-outcomes"><view wx:for="{{item.outcomes}}" wx:for-item="outcome" wx:key="*this">• {{outcome}}</view></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="diary-section-card">
+    <view class="diary-section-head"><view class="diary-section-title">待办发生了什么</view><view>{{diaryStats.newTodos + diaryStats.completed + diaryStats.notes}} 条变化</view></view>
+    <view class="change-group">
+      <view class="change-label">今天新记下</view>
+      <view wx:if="{{!diaryNewTodos.length}}" class="change-empty">没有新增待办</view>
+      <view wx:for="{{diaryNewTodos}}" wx:key="id" class="change-row">{{item.title}}</view>
+    </view>
+    <view class="change-group">
+      <view class="change-label">今天实际完成</view>
+      <view wx:if="{{!diaryCompleted.length}}" class="change-empty">今天还没有完成记录</view>
+      <view wx:for="{{diaryCompleted}}" wx:key="id" class="change-row"><text>{{item.title}}</text><text wx:if="{{item.time}}">{{item.time}}</text></view>
+    </view>
+    <view wx:if="{{diaryJournals.length}}" class="change-group">
+      <view class="change-label">今天的灵光一现</view>
+      <view wx:for="{{diaryJournals}}" wx:key="id" class="change-row">{{item.title}}</view>
+    </view>
+    <view class="fold-row" bindtap="toggleTodoNotes">
+      <view>今天补充的待办笔记 · {{diaryTodoNotes.length}}</view><view>{{showTodoNotes ? '收起' : '展开'}}</view>
+    </view>
+    <view wx:if="{{showTodoNotes}}" class="todo-note-list">
+      <view wx:if="{{!diaryTodoNotes.length}}" class="diary-empty">今天还没有补充待办笔记。</view>
+      <view wx:for="{{diaryTodoNotes}}" wx:key="id" class="todo-note-row">
+        <view class="todo-note-top"><text>{{item.todoTitle}}</text><text>{{item.time}}</text></view>
+        <view>{{item.content}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="diary-fold-card">
+    <view class="fold-row main-fold" bindtap="toggleDiaryHistory">
+      <view><text class="fold-title">往日小记</text><text class="fold-count">{{pastDiaryDays.length}} 天 · 只保留“一眼看完”正文</text></view>
+      <view>{{showDiaryHistory ? '收起' : '展开'}}</view>
+    </view>
+    <scroll-view wx:if="{{showDiaryHistory}}" scroll-y class="diary-history-scroll" enhanced show-scrollbar>
+      <view wx:if="{{!pastDiaryDays.length}}" class="diary-empty">还没有往日小记。</view>
+      <view wx:for="{{pastDiaryDays}}" wx:key="date" class="history-day">
+        <view class="history-date"><view><text>{{item.dateLabel}}</text><text>{{item.weekLabel}}</text></view><text>{{item.sourceLabel}}</text></view>
+        <view class="history-summary"><markdown-view content="{{item.summary}}" /></view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="diary-fold-card legacy-card">
+    <view class="fold-row main-fold" bindtap="toggleLegacyTasks">
+      <view><text class="fold-title">旧的长期计划</text><text class="fold-count">{{tasks.length}} 项正在推进，默认收起</text></view>
+      <view>{{showLegacyTasks ? '收起' : '展开'}}</view>
+    </view>
+    <view wx:if="{{showLegacyTasks}}" class="legacy-content">
+      <view class="legacy-actions"><button class="quiet-button" bindtap="addTask">用文字添加</button></view>
+      <view class="task-toolbar"><input class="search" placeholder="搜索任务或项目" value="{{query}}" bindinput="onSearch" /><view class="owner-tabs"><view wx:for="{{ownerTabs}}" wx:key="value" class="owner-tab {{ownerIndex === index ? 'active' : ''}}" data-index="{{index}}" bindtap="onOwnerChange">{{item.label}}</view></view></view>
+      <view class="list-heading"><view>进行中</view><view>{{tasks.length}}</view></view>
+      <view wx:if="{{!loading && !tasks.length}}" class="card empty">没有符合条件的进行中任务。</view>
+      <view wx:for="{{tasks}}" wx:key="id" class="task-card owner-border-{{item.owner}}">
+        <view class="task-topline"><view class="task-title">{{item.title}}</view><view class="owner-chip {{item.owner}}">{{item.ownerLabel}}</view></view>
+        <view wx:if="{{item.description}}" class="description">{{item.description}}</view>
+        <view class="next-action"><text>下一步</text>{{item.nextAction || '等待明确下一步'}}</view>
+        <view wx:if="{{item.currentStep}}" class="current-step"><view><view class="current-label">当前步骤</view><view class="current-title">{{item.currentStep.title}}</view></view><button class="complete-step" data-id="{{item.id}}" bindtap="completeStep">完成此步</button></view>
+        <view wx:if="{{item.stepCount}}" class="step-meta" data-id="{{item.id}}" bindtap="toggleSteps"><view>步骤 {{item.doneSteps}} / {{item.stepCount}}</view><view>{{item.expanded ? '收起' : '查看全部'}}</view></view>
+        <view wx:if="{{item.expanded}}" class="step-list"><view wx:for="{{item.steps}}" wx:for-item="step" wx:key="id" class="step-row step-{{step.status}}"><view class="step-marker"></view><view>{{step.title}}</view></view></view>
+        <view class="progress-row"><slider class="progress-slider" value="{{item.progress}}" min="0" max="100" step="5" block-size="10" activeColor="#5367d9" backgroundColor="#e5e7eb" data-id="{{item.id}}" bindchange="changeProgress"/><view class="progress-label">{{item.stepCount ? item.doneSteps + '/' + item.stepCount + ' 步' : item.progress + '%'}}</view></view>
+        <view class="task-meta"><view>{{item.estimatedMinutes ? '预计 ' + item.estimatedMinutes + ' 分钟 · ' : ''}}{{item.project || '未分类'}}</view><button class="source-button" data-id="{{item.id}}" bindtap="showSources">来源 {{item.sourceCount}}</button></view>
+        <view class="task-actions"><button class="text-button" data-id="{{item.id}}" bindtap="reanalyze">AI 复核</button><button class="text-button danger" data-id="{{item.id}}" bindtap="archive">管理</button></view>
+      </view>
+      <view wx:if="{{completed.length}}" class="completed-toggle" bindtap="toggleCompleted"><view>已完成任务</view><view>{{completed.length}} · {{showCompleted ? '收起' : '展开'}}</view></view>
+      <view wx:if="{{showCompleted}}"><view wx:for="{{completed}}" wx:key="id" class="completed-card"><view class="task-topline"><view class="task-title">{{item.title}}</view><view class="done-label">{{item.status === 'done' ? '已完成' : '已归档'}}</view></view><view class="task-meta"><view>{{item.project || '未分类'}}</view><button class="source-button" data-id="{{item.id}}" bindtap="showSources">来源 {{item.sourceCount}}</button></view></view></view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,56 @@
+{
+  "rows": [
+    {
+      "id": "done-priority",
+      "status": "done",
+      "priority": "high",
+      "priorityPinned": true,
+      "pinned": true,
+      "sortRank": 9999,
+      "createdAt": "2026-08-18T09:00:00.000Z"
+    },
+    {
+      "id": "open-old",
+      "status": "planned",
+      "priority": "normal",
+      "priorityPinned": false,
+      "pinned": false,
+      "sortRank": 100,
+      "createdAt": "2026-08-18T08:00:00.000Z"
+    },
+    {
+      "id": "pin-new",
+      "status": "planned",
+      "priority": "normal",
+      "priorityPinned": false,
+      "pinned": true,
+      "sortRank": 900,
+      "createdAt": "2026-08-18T09:00:00.000Z"
+    },
+    {
+      "id": "priority-old",
+      "status": "planned",
+      "priority": "high",
+      "priorityPinned": true,
+      "pinned": true,
+      "sortRank": 50,
+      "createdAt": "2026-08-17T08:00:00.000Z"
+    },
+    {
+      "id": "open-new",
+      "status": "planned",
+      "priority": "normal",
+      "priorityPinned": false,
+      "pinned": false,
+      "sortRank": 800,
+      "createdAt": "2026-08-18T10:00:00.000Z"
+    }
+  ],
+  "expected": [
+    "priority-old",
+    "pin-new",
+    "open-new",
+    "open-old",
+    "done-priority"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "markdown-it",
+  "version": "15.0.2",
+  "source": "https://registry.npmjs.org/markdown-it/-/markdown-it-15.0.2.tgz",
+  "integrity": "sha512-q4IGxMv56jCqT4OCRCADBoDP3LO4MhmTXjFbphHPXs4g3j9Xg5RDnxqN8IF/3vIWEU+VCnUq+7JUg/cfy2E6Qw==",
+  "bundle": "dist/browser/markdown-it.umd.min.js",
+  "modification": "Removed sourceMappingURL comment only",
+  "sha256": "14A6DB5A99C26971D48810F38575A1F472A042FF47CCBB9807EF404CF81C1F3A"
+}

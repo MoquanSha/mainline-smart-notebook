@@ -1,0 +1,4 @@
+# Keep the shared renderer identical on both platforms and preserve vendor hashes.
+**/shared/markdown.js text eol=lf
+**/miniprogram/utils/markdown.js text eol=lf
+**/vendor/markdown-it.js -text

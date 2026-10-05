@@ -1,0 +1,7 @@
+<view class="gallery {{compact ? 'compact' : ''}}">
+  <view wx:for="{{photos}}" wx:key="key" class="photo">
+    <image wx:if="{{item.url && !item.error}}" class="image" src="{{item.url}}" mode="aspectFill" data-id="{{item.id}}" bindtap="preview" binderror="imageError" />
+    <button wx:else class="placeholder" data-id="{{item.id}}" bindtap="retry" disabled="{{item.loading}}">{{item.loading ? '正在读取图片' : item.error || '点按读取图片'}}</button>
+    <text wx:if="{{!item.fileID && (item.localFilePath || item.filePath)}}" class="photo-status">待上传</text>
+  </view>
+</view>

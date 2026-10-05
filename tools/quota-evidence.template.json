@@ -1,0 +1,21 @@
+{
+  "capturedAt": "",
+  "environmentId": "YOUR_CLOUDBASE_ENV_ID",
+  "windowHours": 24,
+  "migrationOnly": false,
+  "metricCoverage": {
+    "complete": false,
+    "warnings": []
+  },
+  "metrics": {
+    "apiCalls": 0,
+    "noSqlReadRequests": 0,
+    "noSqlWriteRequests": 0,
+    "cloudFunctionInvocations": 0,
+    "storageReadRequests": 0,
+    "storageWriteRequests": 0,
+    "trafficBytes": 0,
+    "idleActivity": 0
+  }
+}
+

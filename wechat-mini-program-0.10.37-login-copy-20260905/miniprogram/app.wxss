@@ -1,0 +1,163 @@
+page {
+  background: #ffffff;
+  color: #171820;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.page {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 36rpx 32rpx 72rpx;
+}
+
+.eyebrow {
+  color: #5367d9;
+  font-size: 23rpx;
+  font-weight: 650;
+  letter-spacing: .02em;
+}
+
+.title {
+  margin-top: 10rpx;
+  color: #171820;
+  font-size: 52rpx;
+  font-weight: 740;
+  line-height: 1.12;
+  letter-spacing: -.04em;
+}
+
+.subtitle {
+  margin-top: 10rpx;
+  color: #747782;
+  font-size: 25rpx;
+  line-height: 1.55;
+}
+
+.section-title {
+  margin: 44rpx 0 18rpx;
+  color: #171820;
+  font-size: 33rpx;
+  font-weight: 720;
+  line-height: 1.25;
+}
+
+.card {
+  box-sizing: border-box;
+  margin-bottom: 20rpx;
+  padding: 26rpx;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 18rpx;
+  background: #ffffff;
+}
+
+.empty {
+  padding: 54rpx 24rpx;
+  color: #a0a3ad;
+  text-align: center;
+  font-size: 25rpx;
+  line-height: 1.55;
+}
+
+.primary-button,
+.secondary-button {
+  box-sizing: border-box;
+  height: 72rpx;
+  padding: 0 24rpx;
+  border-radius: 14rpx;
+  font-size: 25rpx;
+  font-weight: 650;
+  line-height: 72rpx;
+}
+
+.primary-button {
+  background: #5367d9;
+  color: #ffffff;
+}
+
+.secondary-button {
+  border: 1rpx solid #d8dbe2;
+  background: #ffffff;
+  color: #3c3e49;
+}
+
+button::after {
+  border: none;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.header-copy { min-width: 0; flex: 1; }
+
+.header-action,
+.quiet-button {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  height: 64rpx;
+  margin: 4rpx 0 0;
+  padding: 0 18rpx;
+  border: 1rpx solid #d8dbe2;
+  border-radius: 12rpx;
+  background: #fff;
+  color: #5367d9;
+  font-size: 22rpx;
+  font-weight: 650;
+  line-height: 62rpx;
+}
+
+.section-rule {
+  height: 1rpx;
+  margin: 38rpx 0;
+  background: #e5e7eb;
+}
+
+.owner-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38rpx;
+  padding: 0 11rpx;
+  border-radius: 9rpx;
+  font-size: 20rpx;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.owner-chip.me { color: #3867c8; background: #edf4ff; }
+.owner-chip.ai { color: #7157b8; background: #f2effc; }
+.owner-chip.both { color: #287d78; background: #e9f6f4; }
+
+.source-meta {
+  overflow: hidden;
+  color: #8a8e99;
+  font-size: 20rpx;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Shared input identity: one restrained shape language, with color reserved for context. */
+.input-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  color: #696e79;
+  font-size: 20rpx;
+  font-weight: 680;
+  line-height: 1;
+}
+
+.input-kicker-mark {
+  width: 17rpx;
+  height: 17rpx;
+  border-radius: 5rpx;
+  transform: rotate(8deg);
+}
+
+.input-kicker-blue { color: #5367d9; }
+.input-kicker-blue .input-kicker-mark { background: #5367d9; }
+.input-kicker-warm { color: #9a6438; }
+.input-kicker-warm .input-kicker-mark { background: #c58b54; }

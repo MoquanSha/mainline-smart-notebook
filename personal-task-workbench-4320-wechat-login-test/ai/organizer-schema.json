@@ -1,0 +1,201 @@
+{
+  "type": "object",
+  "properties": {
+    "summary": {
+      "type": "string"
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "task_create",
+              "task_update",
+              "decision",
+              "achievement",
+              "blocker",
+              "note",
+              "calendar_event"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "project": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string",
+            "enum": ["me", "ai", "both"]
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["high", "normal", "low"]
+          },
+          "importance": {
+            "type": "string",
+            "enum": ["important", "not_important"]
+          },
+          "urgency": {
+            "type": "string",
+            "enum": ["urgent", "not_urgent"]
+          },
+          "progress": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "estimatedMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1440
+          },
+          "nextAction": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "owner": {
+                  "type": "string",
+                  "enum": ["me", "ai", "both"]
+                },
+                "startDate": { "type": "string" },
+                "dueDate": { "type": "string" },
+                "estimatedMinutes": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1440
+                }
+              },
+              "required": [
+                "title",
+                "owner",
+                "startDate",
+                "dueDate",
+                "estimatedMinutes"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "why": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "userIntent": {
+            "type": "string",
+            "enum": [
+              "explicit_action",
+              "explicit_update",
+              "fixed_event",
+              "completed_result",
+              "decision",
+              "blocker",
+              "background",
+              "question",
+              "product_instruction",
+              "cancelled"
+            ]
+          },
+          "suggestedHandling": {
+            "type": "string",
+            "enum": ["ask_user", "auto_apply", "record_only", "ignore"]
+          },
+          "usefulness": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "confirmationQuestion": {
+            "type": "string"
+          },
+          "needsConfirmation": {
+            "type": "boolean"
+          },
+          "uncertaintyReason": {
+            "type": "string"
+          },
+          "eventDate": {
+            "type": "string"
+          },
+          "eventTime": {
+            "type": "string"
+          },
+          "eventEndTime": {
+            "type": "string"
+          },
+          "departureTime": {
+            "type": "string"
+          },
+          "preparationMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 240
+          },
+          "eventDurationMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1440
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "detail",
+          "taskId",
+          "project",
+          "owner",
+          "priority",
+          "importance",
+          "urgency",
+          "progress",
+          "dueDate",
+          "startDate",
+          "estimatedMinutes",
+          "nextAction",
+          "steps",
+          "why",
+          "confidence",
+          "userIntent",
+          "suggestedHandling",
+          "usefulness",
+          "confirmationQuestion",
+          "needsConfirmation",
+          "uncertaintyReason",
+          "eventDate",
+          "eventTime",
+          "eventEndTime",
+          "departureTime",
+          "preparationMinutes",
+          "eventDurationMinutes"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["summary", "actions"],
+  "additionalProperties": false
+}

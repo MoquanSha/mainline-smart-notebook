@@ -1,0 +1,25 @@
+<view wx:if="{{job.reviewId && job.status === 'failed'}}" class="review">
+  <view wx:if="{{job.reviewHost !== 'cloud'}}" class="hint">这次整理的疑点稿保留在电脑端，可在电脑查看。</view>
+  <block wx:else>
+    <button class="action" bindtap="toggle">{{opened ? '收起整理疑点' : '查看整理疑点'}}</button>
+    <view wx:if="{{opened}}" class="panel">
+      <view class="hint">候选稿尚未采用，原文保持不变。可对照后使用原页面的重试整理按钮。</view>
+      <view wx:if="{{loading}}" class="hint">正在读取检查记录…</view>
+      <view wx:if="{{error}}" class="error">{{error}}<button class="action" disabled="{{loading}}" bindtap="reload">重新读取</button></view>
+      <block wx:if="{{review}}">
+        <view wx:if="{{assembled}}" class="hint">整篇拼接检查发现疑点，以下按段展示当时的候选稿。标记检查仅供辅助核对。</view>
+        <view wx:else class="hint">第 {{review.failedPartIndex + 1}} 段检查发现疑点，以下可翻阅本次保存的候选稿。标记检查仅供辅助核对。</view>
+        <view wx:for="{{findingText}}" wx:key="*this" class="finding">{{item}}</view>
+        <view class="label">本次整理时的原文</view>
+        <text user-select class="copy">{{review.originalAvailable ? review.original : '旧检查记录未保留分段原文，请查看笔记中的原文。'}}</text>
+        <view class="label">未采用的候选稿</view>
+        <text user-select class="copy">{{review.candidate}}</text>
+        <view class="pager">
+          <button class="action" disabled="{{loading || review.index === 0}}" bindtap="previous">上一段</button>
+          <view>第 {{review.index + 1}} 段 · 可查看 {{review.availableParts}} / 共 {{review.totalParts}} 段</view>
+          <button class="action" disabled="{{loading || review.index + 1 >= review.availableParts}}" bindtap="next">下一段</button>
+        </view>
+      </block>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,8 @@
+{
+  "name": "mainline-reliability-migration-backfill",
+  "private": true,
+  "main": "index.js",
+  "dependencies": {
+    "@cloudbase/node-sdk": "^3.18.3"
+  }
+}

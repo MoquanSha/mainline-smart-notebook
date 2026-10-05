@@ -1,0 +1,48 @@
+<view class="onboarding-page">
+  <view class="brand-mark"><view class="brand-line"></view><view class="brand-dot"></view></view>
+  <view class="brand-name">主线笔记</view>
+
+  <block wx:if="{{stage === 'login'}}">
+    <view class="hero-title">用微信继续</view>
+    <view class="hero-copy">使用当前微信身份登录，手机和电脑可以进入同一个个人空间。</view>
+    <button class="wechat-button" loading="{{busy}}" disabled="{{busy}}" bindtap="loginWithWechat">微信身份登录</button>
+    <button class="secondary-action" disabled="{{busy}}" bindtap="scanDesktopLogin">扫描电脑登录二维码</button>
+    <view class="privacy-note">只识别微信用户身份，不读取手机号、头像或昵称。</view>
+  </block>
+
+  <block wx:elif="{{stage === 'create'}}">
+    <view class="status-chip">微信身份已确认</view>
+    <view class="hero-title">创建个人空间</view>
+    <view class="hero-copy">你的今日待办、灵光一现、今日小记和数据档案会保存在这里。</view>
+    <button class="primary-action" loading="{{busy}}" disabled="{{busy}}" bindtap="createPersonalSpace">创建个人空间</button>
+  </block>
+
+  <block wx:elif="{{stage === 'desktop'}}">
+    <view class="status-chip">电脑端登录</view>
+    <view class="hero-title">允许这台电脑登录？</view>
+    <view class="device-card"><view class="device-icon">电</view><view><view class="device-name">{{deviceName}}</view><view class="device-meta">将进入你的个人空间并同步数据</view></view></view>
+    <button class="primary-action" loading="{{busy}}" disabled="{{busy}}" bindtap="confirmDesktopLogin">确认登录</button>
+    <button class="secondary-action" disabled="{{busy}}" bindtap="cancelDesktopLogin">取消</button>
+  </block>
+
+  <block wx:elif="{{stage === 'desktop-success'}}">
+    <view class="success-mark">✓</view>
+    <view class="hero-title">电脑已登录</view>
+    <view class="hero-copy">可以返回电脑端，主线笔记会自动进入你的个人空间。</view>
+    <button class="secondary-action" bindtap="enterApp">进入小程序</button>
+  </block>
+
+  <block wx:elif="{{stage === 'desktop-cancelled'}}">
+    <view class="hero-title">已取消登录</view>
+    <view class="hero-copy">这台电脑没有获得你的个人空间访问权限。</view>
+    <button class="secondary-action" bindtap="enterApp">返回主线笔记</button>
+  </block>
+
+  <block wx:elif="{{stage === 'desktop-error'}}">
+    <view class="hero-title">二维码已失效</view>
+    <view class="hero-copy">请回到电脑端重新生成二维码。</view>
+    <button class="secondary-action" bindtap="enterApp">返回主线笔记</button>
+  </block>
+
+  <view wx:if="{{error}}" class="error-message">{{error}}</view>
+</view>

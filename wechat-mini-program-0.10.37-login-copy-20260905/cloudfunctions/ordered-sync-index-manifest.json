@@ -1,0 +1,15 @@
+{
+  "protocol": 2,
+  "status": "ready",
+  "enableFlags": {
+    "ENABLE_ORDERED_SYNC": "true",
+    "ORDERED_SYNC_INDEXES_VERIFIED": "true"
+  },
+  "requiredQueryShapes": [
+    { "collection": "tasks", "fields": ["ownerOpenId", "_syncSequence", "_id"] },
+    { "collection": "daily_tasks", "fields": ["ownerOpenId", "_syncSequence", "_id"] },
+    { "collection": "captures", "fields": ["ownerOpenId", "_syncSequence", "_id"] },
+    { "collection": "day_records", "fields": ["ownerOpenId", "_syncSequence", "_id"] }
+  ],
+  "releaseGate": "Run sync.backfillOrdered for every workspace, verify the four query shapes in CloudBase, then set both enable flags together."
+}

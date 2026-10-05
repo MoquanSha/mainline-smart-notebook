@@ -1,0 +1,18 @@
+{
+  "capturedAt": "",
+  "environmentId": "YOUR_CLOUDBASE_ENV_ID",
+  "releaseSet": "reliability-20260925.3",
+  "desktopVersion": "1.1.63-reliability.3",
+  "miniVersion": "0.10.44",
+  "checks": {
+    "phone_to_desktop_add": { "status": "pending", "evidence": "" },
+    "desktop_to_phone_add": { "status": "pending", "evidence": "" },
+    "both_sides_delete": { "status": "pending", "evidence": "" },
+    "history_and_photos": { "status": "pending", "evidence": "" },
+    "offline_restart_retry": { "status": "pending", "evidence": "" },
+    "concurrent_edit": { "status": "pending", "evidence": "" },
+    "cross_midnight": { "status": "pending", "evidence": "" },
+    "account_workspace_switch": { "status": "pending", "evidence": "" }
+  }
+}
+

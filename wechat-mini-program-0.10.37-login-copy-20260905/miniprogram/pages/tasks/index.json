@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "今日小记",
+  "usingComponents": {
+    "organization-review": "/components/organization-review/index",
+    "markdown-view": "/components/markdown-view/index"
+  }
+}

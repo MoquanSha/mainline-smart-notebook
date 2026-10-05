@@ -1,0 +1,5 @@
+.diary-summary{display:flex;flex-direction:column;gap:12rpx;white-space:pre-wrap;overflow-wrap:anywhere}
+.diary-markdown-heading{margin-top:8rpx;color:#25283a;font-size:27rpx;font-weight:720;line-height:1.45}
+.diary-markdown-list-item{display:flex;gap:10rpx;padding-left:8rpx;color:#484b55;font-size:24rpx;line-height:1.6}
+.diary-markdown-list-item text{flex:0 0 auto;color:#5367d9}
+.diary-markdown-paragraph{color:#30323b;font-size:24rpx;line-height:1.7}

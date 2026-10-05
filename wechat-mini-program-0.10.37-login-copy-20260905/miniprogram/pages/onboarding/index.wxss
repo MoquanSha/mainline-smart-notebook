@@ -1,0 +1,22 @@
+page { background: #f7f8fb; }
+.onboarding-page { box-sizing: border-box; min-height: 100vh; padding: 112rpx 52rpx 72rpx; color: #171820; }
+.brand-mark { position: relative; width: 72rpx; height: 72rpx; border-radius: 22rpx; background: #5367d9; box-shadow: 0 14rpx 36rpx rgba(83,103,217,.2); }
+.brand-line { position: absolute; left: 19rpx; top: 21rpx; width: 35rpx; height: 25rpx; border: 4rpx solid #fff; border-top: 0; border-radius: 0 0 10rpx 10rpx; }
+.brand-dot { position: absolute; right: 15rpx; top: 14rpx; width: 11rpx; height: 11rpx; border-radius: 50%; background: #b9c3ff; }
+.brand-name { margin-top: 22rpx; color: #5367d9; font-size: 25rpx; font-weight: 720; }
+.hero-title { margin-top: 98rpx; font-size: 56rpx; font-weight: 760; line-height: 1.15; letter-spacing: -.04em; }
+.hero-copy { margin-top: 22rpx; color: #6f7480; font-size: 27rpx; line-height: 1.65; }
+.wechat-button,.primary-action,.secondary-action { box-sizing: border-box; width: 100%; height: 92rpx; margin-top: 58rpx; border-radius: 18rpx; font-size: 28rpx; font-weight: 700; line-height: 92rpx; }
+.wechat-button { background: #07c160; color: #fff; box-shadow: 0 14rpx 30rpx rgba(7,193,96,.18); }
+.primary-action { background: #5367d9; color: #fff; box-shadow: 0 14rpx 30rpx rgba(83,103,217,.18); }
+.secondary-action { margin-top: 20rpx; border: 1rpx solid #d9dce4; background: #fff; color: #4c505b; }
+.privacy-note { margin-top: 24rpx; color: #9a9eaa; font-size: 21rpx; line-height: 1.55; text-align: center; }
+.status-chip { display: inline-flex; margin-top: 88rpx; padding: 10rpx 16rpx; border-radius: 999rpx; background: #eaf7ef; color: #18834a; font-size: 21rpx; font-weight: 680; }
+.status-chip + .hero-title { margin-top: 30rpx; }
+.device-card { display: flex; align-items: center; gap: 22rpx; margin-top: 42rpx; padding: 26rpx; border: 1rpx solid #e0e3eb; border-radius: 20rpx; background: #fff; }
+.device-icon { display: flex; width: 70rpx; height: 70rpx; flex: 0 0 auto; align-items: center; justify-content: center; border-radius: 18rpx; background: #eef1ff; color: #5367d9; font-size: 25rpx; font-weight: 740; }
+.device-name { font-size: 27rpx; font-weight: 720; }
+.device-meta { margin-top: 8rpx; color: #858a96; font-size: 21rpx; }
+.success-mark { display: flex; width: 92rpx; height: 92rpx; margin-top: 92rpx; align-items: center; justify-content: center; border-radius: 50%; background: #e7f7ee; color: #07a957; font-size: 50rpx; font-weight: 760; }
+.success-mark + .hero-title { margin-top: 34rpx; }
+.error-message { margin-top: 24rpx; padding: 20rpx; border-radius: 14rpx; background: #fff0f0; color: #a34444; font-size: 22rpx; line-height: 1.5; }

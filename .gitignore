@@ -1,0 +1,10 @@
+**/node_modules/
+**/.tmp/
+**/.codex-qa/
+**/dist/
+**/release*/
+**/data/
+**/*.log
+**/.env*
+**/project.private.config.json
+personal-task-workbench-4320-wechat-login-test/wechat-mini-program/

@@ -1,0 +1,6 @@
+<view class="markdown-view">
+  <rich-text nodes="{{nodes}}" user-select />
+  <view wx:if="{{links.length}}" class="markdown-links">
+    <button wx:for="{{links}}" wx:key="url" class="markdown-link" data-index="{{index}}" bindtap="copyLink">复制链接 · {{item.label}}</button>
+  </view>
+</view>

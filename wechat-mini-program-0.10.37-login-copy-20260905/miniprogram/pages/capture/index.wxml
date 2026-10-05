@@ -1,0 +1,151 @@
+<template name="journal-card">
+  <view class="journal-card {{entry.complete ? 'is-complete' : ''}} {{entry.pending ? 'is-pending' : ''}} {{entry.favorite ? 'is-favorite' : ''}} {{entry.hidden ? 'is-hidden' : ''}} {{readonly ? 'is-readonly' : ''}}">
+    <view class="entry-top">
+      <view class="entry-source source-{{entry.source}}">{{entry.sourceLabel}}</view>
+      <view class="entry-meta">{{entry.typeLabel}}<text wx:if="{{entry.createdLabel}}"> · {{entry.createdLabel}}</text></view>
+      <view wx:if="{{entry.organizerLabel}}" class="organizer-badge organizer-{{entry.organizerTone}}">{{entry.organizerLabel}}</view>
+      <view wx:if="{{entry.syncLabel}}" class="organizer-badge organizer-pending">{{entry.syncLabel}}</view>
+      <view wx:if="{{entry.favorite}}" class="favorite-mark">★ 收藏</view>
+    </view>
+    <view class="entry-title">{{entry.displayTitle}}</view>
+    <view wx:if="{{entry.syncBlocked && entry.syncError}}" class="organization-error">{{entry.syncError}}</view>
+    <view wx:if="{{entry.organizationFailed && entry.organizationError}}" class="organization-error">{{entry.organizationError}}</view>
+    <organization-review kind="journal_entry" entry-id="{{entry.id}}" job="{{entry.organizationJob}}" scope="{{entry.reviewScope}}" />
+    <view wx:if="{{entry.showOriginal}}" class="journal-original">{{entry.originalContent}}</view>
+    <view wx:if="{{entry.showBody}}" class="entry-summary {{entry.summaryLong && !entry.bodyExpanded ? 'is-collapsed' : ''}}"><markdown-view nodes="{{entry.bodyNodes}}" /></view>
+    <button wx:if="{{entry.summaryLong}}" class="entry-expand" data-id="{{entry.id}}" bindtap="toggleBody">{{entry.bodyExpanded ? '收起全文' : '展开全文'}}</button>
+
+    <view wx:if="{{entry.itemCount}}" class="checklist">
+      <view wx:for="{{entry.checklistItems}}" wx:for-item="check" wx:key="id" class="check-row {{check.done ? 'is-done' : ''}}" data-entry="{{entry.id}}" data-item="{{check.id}}" bindtap="toggleItem">
+        <view class="check-box"><text wx:if="{{check.done}}">✓</text></view>
+        <view class="check-text">{{check.text}}</view>
+      </view>
+      <view class="progress-copy">已完成 {{entry.doneCount}} / {{entry.itemCount}}</view>
+    </view>
+
+    <view wx:if="{{entry.supplements.length}}" class="supplement-list">
+      <view class="supplement-label">补充笔记</view>
+      <view wx:for="{{entry.supplements}}" wx:for-item="supplement" wx:key="id" class="supplement-row">
+        <markdown-view nodes="{{supplement.bodyNodes}}" /><text wx:if="{{supplement.createdLabel}}" class="supplement-time">{{supplement.createdLabel}}</text>
+      </view>
+    </view>
+    <view wx:if="{{entry.showSupplement && !readonly}}" class="supplement-editor">
+      <textarea class="supplement-input" placeholder="继续补充这条笔记……" value="{{entry.supplementText}}" maxlength="-1" data-id="{{entry.id}}" bindinput="onSupplementInput" />
+      <view class="supplement-controls"><button class="cancel-action" data-id="{{entry.id}}" bindtap="toggleSupplement">收起</button><button class="save-supplement" loading="{{entry.savingSupplement}}" disabled="{{entry.savingSupplement}}" data-id="{{entry.id}}" bindtap="saveSupplement">保存补充</button></view>
+    </view>
+    <view wx:if="{{entry.showMarkdown}}" class="markdown-preview">
+      <text user-select class="markdown-source">{{entry.markdown}}</text>
+    </view>
+    <view wx:if="{{!readonly || allowHide || allowFavorite}}" class="entry-actions">
+      <button class="text-action secondary-action" data-id="{{entry.id}}" bindtap="toggleOriginal">{{entry.showOriginal ? '收起原文' : '查看原文'}}</button>
+      <button wx:if="{{entry.organizationCanRetry && !entry.pending}}" class="text-action" data-id="{{entry.id}}" bindtap="retryOrganization">重试整理</button>
+      <button wx:if="{{(!readonly || allowFavorite) && !entry.hidden}}" class="text-action {{entry.favorite ? 'is-active' : ''}}" data-id="{{entry.id}}" data-action="favorite" bindtap="mutateRecord">{{entry.favorite ? '取消收藏' : '收藏'}}</button>
+      <button wx:if="{{!readonly}}" class="text-action" data-id="{{entry.id}}" bindtap="toggleSupplement">{{entry.showSupplement ? '收起补充' : '补充'}}</button>
+      <button wx:if="{{!readonly && entry.markdown}}" class="text-action secondary-action" data-id="{{entry.id}}" bindtap="toggleMarkdown">{{entry.showMarkdown ? '收起源码' : 'Markdown 源码'}}</button>
+      <button wx:if="{{!entry.hidden && !entry.favorite && (!readonly || allowHide)}}" class="hide-action" data-id="{{entry.id}}" data-action="hide" bindtap="mutateRecord">隐藏</button>
+      <button wx:if="{{entry.hidden}}" class="restore-action" data-id="{{entry.id}}" data-action="restore" bindtap="mutateRecord">恢复</button>
+    </view>
+  </view>
+</template>
+
+<view class="page journal-page">
+  <view class="journal-header">
+    <view>
+      <view class="eyebrow">随手写下，系统替你整理</view>
+      <view class="title">灵光一现</view>
+    </view>
+    <view class="journal-header-actions">
+      <button class="journal-refresh" loading="{{refreshingJournal}}" disabled="{{refreshingJournal}}" bindtap="syncJournalFromCloud">同步刷新</button>
+      <view class="pending-tab {{showPending ? 'is-open' : ''}}" bindtap="togglePending">
+        <text>待确认</text><text class="pending-badge">{{proposals.length}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showPending}}" class="pending-panel">
+    <view class="pending-panel-head">
+      <view><view class="panel-title">待确认</view><view class="panel-copy">只决定 AI 不能替你决定的内容</view></view>
+      <button wx:if="{{proposals.length}}" class="apply-all" loading="{{applyingAll}}" bindtap="applyAllProposals">全部采用</button>
+    </view>
+    <view wx:if="{{loadingProposals}}" class="pending-empty">正在读取……</view>
+    <view wx:elif="{{!proposals.length}}" class="pending-empty">目前没有需要你确认的内容</view>
+    <view wx:for="{{proposals}}" wx:key="id" class="pending-card">
+      <view class="pending-card-meta"><text>{{item.sourceLabel}}</text><text>{{item.typeLabel}}</text></view>
+      <view class="pending-card-title">{{item.title}}</view>
+      <view wx:if="{{item.detail}}" class="pending-card-detail">{{item.detail}}</view>
+      <view class="pending-effect">采用后 · {{item.effectLabel}}</view>
+      <view class="pending-actions">
+        <button class="pending-action quiet" data-id="{{item.id}}" data-action="reject" bindtap="handleProposal">忽略</button>
+        <button class="pending-action quiet" data-id="{{item.id}}" data-action="defer" bindtap="handleProposal">稍后</button>
+        <button class="pending-action primary" data-id="{{item.id}}" data-action="apply" bindtap="handleProposal">采用</button>
+      </view>
+    </view>
+    <button class="detail-entry" bindtap="openProposalDetails">编辑与查看稍后内容 ›</button>
+  </view>
+
+  <view class="journal-composer">
+    <view class="input-kicker input-kicker-warm"><view class="input-kicker-mark"></view><text>记录</text></view>
+    <textarea class="journal-textarea" placeholder="例如：计划买菜，买西红柿、鸡蛋和牛奶……" value="{{content}}" maxlength="-1" bindinput="onInput" />
+    <view class="save-modes">
+      <view class="save-mode {{saveMode === 'note' ? 'is-active' : ''}}" data-mode="note" bindtap="setSaveMode">普通笔记</view>
+      <view class="save-mode favorite-mode {{saveMode === 'favorite' ? 'is-active' : ''}}" data-mode="favorite" bindtap="setSaveMode">★ 直接收藏</view>
+    </view>
+    <view class="composer-bottom">
+      <button class="file-button" bindtap="importFile">导入 Markdown</button>
+      <button class="primary-button create-button {{content ? '' : 'is-empty'}}" loading="{{saving}}" bindtap="createEntry">{{saveMode === 'favorite' ? '整理并收藏' : '整理进笔记'}}</button>
+    </view>
+  </view>
+
+  <view class="record-group favorite-group">
+    <view class="group-head" bindtap="toggleFavorites"><view class="group-title"><text class="group-symbol favorite-symbol">★</text><text>收藏</text><text class="entry-count">{{favorites.length}}</text></view><text class="group-action">{{showFavorites ? '收起' : '展开'}}</text></view>
+    <view wx:if="{{showFavorites}}" class="group-list">
+      <view wx:if="{{!favorites.length}}" class="pending-empty">还没有收藏，可以从下面的今天记录或历史记录中选择。</view>
+      <block wx:for="{{favorites}}" wx:key="id"><template is="journal-card" data="{{entry: item, readonly: false}}" /></block>
+    </view>
+  </view>
+
+  <view class="section-heading">
+    <view class="section-heading-main"><view class="section-title section-title-inline">今天记下的</view><view class="entry-count">{{entries.length}}</view></view>
+    <view wx:if="{{syncVisible || offlineCount}}" class="sync-inline sync-{{syncTone}}"><view class="sync-dot"></view><text>{{syncMessage}}</text></view>
+  </view>
+  <view wx:if="{{!entries.length}}" class="empty-state"><view class="empty-symbol">✦</view><view class="empty-title">今天还没有笔记</view><view class="empty-copy">从一句话开始，剩下的交给系统整理。</view></view>
+  <block wx:for="{{entries}}" wx:key="id"><template is="journal-card" data="{{entry: item, readonly: false}}" /></block>
+
+  <view wx:if="{{history.length}}" class="record-group history-group">
+    <view class="group-head" bindtap="toggleHistory"><view class="group-title"><text class="group-symbol">↶</text><text>历史记录</text><text class="entry-count">{{historyCount}} 条</text></view><text class="group-action">{{showHistory ? '收起' : '展开'}}</text></view>
+    <view wx:if="{{showHistory}}" class="history-list">
+      <scroll-view class="date-index" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+        <view class="date-index-track"><view wx:for="{{history}}" wx:key="date" class="date-index-item" data-target="history-day-{{item.date}}" bindtap="jumpToDate">{{item.dateLabel}}<text wx:if="{{item.favoriteCount}}" class="date-index-star">★</text></view></view>
+      </scroll-view>
+      <view wx:for="{{history}}" wx:key="date" id="history-day-{{item.date}}" class="history-day">
+        <view class="history-date"><text>{{item.dateLabel}}</text><text wx:if="{{item.favoriteCount}}" class="history-favorite-count">★ {{item.favoriteCount}}</text></view>
+        <block wx:for="{{item.entries}}" wx:for-item="historyEntry" wx:key="id"><template is="journal-card" data="{{entry: historyEntry, readonly: true, allowHide: true, allowFavorite: true}}" /></block>
+      </view>
+    </view>
+  </view>
+
+  <view class="record-group muted-group">
+    <view class="group-head" bindtap="toggleHidden"><view class="group-title"><text class="group-symbol">◌</text><text>隐藏记录</text><text class="entry-count">{{hidden.length}}</text></view><text class="group-action">{{showHidden ? '收起' : '展开'}}</text></view>
+    <view wx:if="{{showHidden}}" class="group-list">
+      <view wx:if="{{!hidden.length}}" class="pending-empty">还没有隐藏内容</view>
+      <block wx:for="{{hidden}}" wx:key="id"><template is="journal-card" data="{{entry: item, readonly: false, allowHide: true}}" /></block>
+    </view>
+  </view>
+
+  <view wx:if="{{reviews.length}}" class="record-group review-group">
+    <view class="group-head" bindtap="toggleReviews"><view class="group-title"><text class="group-symbol">✓</text><text>当天回顾</text><text class="entry-count">{{reviewCount}}</text></view><text class="group-action">{{showReviews ? '收起' : '展开'}}</text></view>
+    <view wx:if="{{showReviews}}" class="review-list">
+      <scroll-view class="date-index" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+        <view class="date-index-track"><view wx:for="{{reviews}}" wx:key="id" class="date-index-item" data-target="review-day-{{item.date}}" bindtap="jumpToDate">{{item.dateLabel}}</view></view>
+      </scroll-view>
+      <view wx:for="{{reviews}}" wx:key="id" id="review-day-{{item.date}}" class="review-day">
+        <view class="review-date">{{item.dateLabel}}</view>
+        <view class="review-card">
+          <view wx:if="{{item.headline}}" class="review-title">{{item.headline}}</view>
+          <view wx:if="{{item.summary}}" class="review-summary">{{item.summary}}</view>
+          <view wx:if="{{item.reflection}}" class="review-reflection"><text class="review-reflection-label">之后继续</text><text>{{item.reflection}}</text></view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

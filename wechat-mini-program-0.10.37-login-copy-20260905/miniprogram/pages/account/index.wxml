@@ -1,0 +1,126 @@
+<view class="page account-page">
+  <block wx:if="{{cloudSyncEnabled}}">
+  <view class="eyebrow">多人内测</view>
+  <view class="title">账号与工作区</view>
+
+  <view wx:if="{{desktopQrStatus}}" class="desktop-qr-result status-{{desktopQrStatus}}">
+    <view class="desktop-qr-kicker">电脑端微信扫码登录</view>
+    <view class="desktop-qr-message">{{desktopQrMessage}}</view>
+    <view wx:if="{{desktopQrStatus === 'pending'}}" class="desktop-qr-actions">
+      <button class="primary-button" bindtap="confirmDesktopQrLogin">确认登录</button>
+      <button class="secondary-button" bindtap="cancelDesktopQrLogin">取消</button>
+    </view>
+    <view class="desktop-qr-hint">确认完成后请回到电脑端，窗口会自动进入你的工作区。</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty">正在读取…</view>
+
+  <view wx:elif="{{onboardingRequired}}" class="join-card">
+    <view class="section-title join-title">输入邀请码</view>
+    <view class="join-copy">邀请码由工作区所有者生成。加入后，手机和已配对电脑会看到同一份任务数据。</view>
+    <input class="field" maxlength="10" value="{{code}}" placeholder="例如 ABCD2345" bindinput="onCodeInput" />
+    <input class="field" maxlength="40" value="{{displayName}}" placeholder="你的显示名称（可选）" bindinput="onNameInput" />
+    <button class="primary-button join-button" loading="{{joining}}" disabled="{{code.length < 6}}" bindtap="join">加入内测</button>
+  </view>
+
+  <block wx:elif="{{account}}">
+    <view class="account-card">
+      <view class="account-name">{{account.user.displayName}}</view>
+      <view class="account-role">{{account.role === 'owner' ? '工作区所有者' : account.role === 'admin' ? '管理员' : '成员'}}</view>
+    </view>
+    <button class="primary-button" bindtap="scanDesktopQrLogin">扫描电脑登录二维码</button>
+
+    <view class="section-title">工作区</view>
+    <view class="workspace-list">
+      <view wx:for="{{account.workspaces}}" wx:key="id" class="workspace-row {{item.active ? 'active' : ''}}" data-id="{{item.id}}" bindtap="switchWorkspace">
+        <view><view class="row-title">{{item.name}}</view><view class="row-meta">{{item.role}} · {{item.plan}}</view></view>
+        <view class="row-state">{{item.active ? '当前' : '切换'}}</view>
+      </view>
+    </view>
+
+    <view class="section-heading"><view class="section-title">成员</view><button wx:if="{{account.role !== 'member'}}" class="quiet-button invite-button" loading="{{creatingInvite}}" bindtap="createInvite">邀请成员</button></view>
+    <view wx:if="{{invite}}" class="invite-result" bindtap="copyInvite"><text class="invite-code">{{invite.code}}</text><text>复制邀请码 · 72 小时有效</text></view>
+    <view class="member-list">
+      <view wx:for="{{members}}" wx:key="id" class="member-row">
+        <view class="member-avatar">{{item.initial}}</view>
+        <view class="member-copy"><view class="row-title">{{item.displayName}}{{item.self ? '（我）' : ''}}</view><view class="row-meta">{{item.role}}</view></view>
+        <button wx:if="{{!item.self && account.role !== 'member' && item.role !== 'owner'}}" class="remove-member" data-id="{{item.id}}" bindtap="removeMember">移出</button>
+      </view>
+    </view>
+
+    <view id="wechat-entry" class="section-heading"><view class="section-title section-title-with-beta">微信聊天入口 <text class="beta-label">内测中</text></view><button class="quiet-button invite-button invite-button-disabled" disabled="{{true}}">暂未开放</button></view>
+    <view class="binding-card primary-chat-entry">
+      <view class="binding-kicker">内测入口 · 服务号</view>
+      <view class="binding-title">关注并连接“主线笔记助手”</view>
+      <view class="official-account-shell">
+        <view class="official-account-fallback">服务号正在注册与关联。完成后，这里会显示官方关注卡片和绑定入口。</view>
+      </view>
+      <view class="binding-steps">
+        <view class="binding-step"><text class="binding-step-number">1</text><view class="binding-step-copy">关注服务号“主线笔记助手”</view></view>
+        <view class="binding-step"><text class="binding-step-number">2</text><view class="binding-step-copy">生成绑定码，并在服务号会话发送绑定指令</view></view>
+        <view class="binding-step"><text class="binding-step-number">3</text><view class="binding-step-copy">回到微信聊天列表，将这个会话置顶</view></view>
+      </view>
+      <view wx:if="{{bindCode}}" class="bind-command" bindtap="copyBindCommand">
+        <view><view class="bind-label">发送给公众号</view><text class="bind-code">绑定 {{bindCode.code}}</text></view>
+        <text class="copy-bind">复制</text>
+      </view>
+      <view wx:else class="binding-note">正式开放后，可直接发送计划、清单或进展。AI 会保留原话并整理进“灵光一现”，目标不明确时进入“待确认”。</view>
+      <view class="pin-note">当前为内测说明，不会进入尚未完成的绑定流程。系统未来也只处理你主动发给“主线笔记助手”的消息。</view>
+    </view>
+  </block>
+
+  </block>
+
+  <view wx:if="{{!cloudSyncEnabled}}" class="section-heading hybrid-heading">
+    <view class="section-title">手机与电脑</view>
+    <view class="hybrid-badge mode-{{hybridMode}}">{{hybridLabel}}</view>
+  </view>
+  <view wx:if="{{!cloudSyncEnabled}}" class="hybrid-card">
+    <view class="hybrid-summary">
+      <view class="hybrid-step is-home"><text class="hybrid-step-number">1</text><view class="hybrid-step-copy"><view class="hybrid-step-title">电脑本地数据</view><view class="hybrid-step-desc">完整内容和备份只保存在你的电脑</view></view></view>
+      <view class="hybrid-step is-phone"><text class="hybrid-step-number">2</text><view class="hybrid-step-copy"><view class="hybrid-step-title">手机离线队列</view><view class="hybrid-step-desc">断网仍可记录，恢复网络后自动补传</view></view></view>
+    </view>
+    <view class="home-state">
+      <text class="home-state-dot {{homeConnected ? 'online' : ''}}"></text>
+      <view class="home-state-copy"><text>{{homeStatus}}</text><text wx:if="{{pendingLocal > 0}}" class="queue-chip">待补传 {{pendingLocal}} 条</text></view>
+    </view>
+    <button wx:if="{{homeConfigured}}" class="primary-button connection-primary" loading="{{homeTesting}}" bindtap="testHomeConnection">{{homeConnected ? '立即同步' : '重新连接并同步'}}</button>
+    <button class="connection-details-toggle" bindtap="toggleConnectionDetails">{{connectionDetailsOpen ? '收起连接信息' : (homeConfigured ? '更换连接信息' : '首次连接电脑')}}</button>
+    <view wx:if="{{connectionDetailsOpen || !homeConfigured}}" class="connection-details">
+      <view class="field-label first-field-label">电脑 HTTPS 地址</view>
+      <input class="field" value="{{serverBaseUrl}}" placeholder="https://你的电脑访问地址" bindinput="onHomeUrlInput" />
+      <view class="field-label token-label">设备连接凭证</view>
+      <input class="field" password value="{{homeToken}}" placeholder="从电脑端复制连接凭证" bindinput="onHomeTokenInput" />
+      <button class="paste-home-button" loading="{{homeTesting}}" bindtap="importHomeConnection">粘贴电脑连接信息</button>
+      <button class="primary-button save-home" loading="{{homeTesting}}" bindtap="saveHomeConnection">保存并连接</button>
+    </view>
+    <view wx:if="{{pendingLocal === 0}}" class="queue-note">手机暂无待上传内容，接收状态以本次检查结果为准</view>
+  </view>
+
+  <view wx:if="{{cloudSyncEnabled}}" class="section-heading hybrid-heading">
+    <view class="section-title">混合容灾</view>
+    <view class="hybrid-badge mode-{{hybridMode}}">{{hybridLabel}}</view>
+  </view>
+  <view wx:if="{{cloudSyncEnabled}}" class="hybrid-card">
+    <view class="hybrid-summary">
+      <view class="hybrid-step is-cloud"><text class="hybrid-step-number">1</text><view class="hybrid-step-copy"><view class="hybrid-step-title">CloudBase 云端</view><view class="hybrid-step-desc">额度正常时作为主数据源</view></view></view>
+      <view class="hybrid-step is-home"><text class="hybrid-step-number">2</text><view class="hybrid-step-copy"><view class="hybrid-step-title">家庭服务器</view><view class="hybrid-step-desc">只在明确额度不足时自动接管</view></view></view>
+      <view class="hybrid-step is-phone"><text class="hybrid-step-number">3</text><view class="hybrid-step-copy"><view class="hybrid-step-title">手机本地</view><view class="hybrid-step-desc">电脑离线时仍可记录，稍后补传</view></view></view>
+    </view>
+    <view class="home-state"><text class="home-state-dot {{homeConnected ? 'online' : ''}}"></text><text>{{homeStatus}}</text></view>
+    <view class="field-label">家庭服务器 HTTPS 地址</view>
+    <input class="field" value="{{serverBaseUrl}}" placeholder="https://你的家庭服务器域名" bindinput="onHomeUrlInput" />
+    <view class="field-label token-label">设备连接凭证</view>
+    <input class="field" password value="{{homeToken}}" placeholder="从家庭版电脑端复制连接凭证" bindinput="onHomeTokenInput" />
+    <button class="primary-button save-home" loading="{{homeTesting}}" bindtap="saveHomeConnection">保存并测试</button>
+    <view class="hybrid-actions"><button class="quiet-button hybrid-action-button" bindtap="testHomeConnection">检查家庭电脑</button><button class="quiet-button hybrid-action-button" loading="{{recoveringCloud}}" bindtap="recoverCloud">检查云端额度</button></view>
+    <view class="queue-note">手机待发送 {{pendingLocal}} 条 · 等待回灌云端 {{pendingCloud}} 条</view>
+  </view>
+  <view wx:if="{{homeRecoveryCount || homeUnscopedCount || homeRecoveryMessage}}" class="hybrid-card">
+    <view class="section-title">待传内容保护</view>
+    <view wx:if="{{homeRecoveryCount}}" class="queue-note">{{homeRecoveryCount}} 条旧操作需要确认接收电脑，原内容仍保留在手机。</view>
+    <button wx:if="{{homeRecoveryCount}}" class="primary-button" loading="{{homeRecovering}}" disabled="{{homeRecovering || !homeConfigured}}" bindtap="recoverHomeTarget">处理待传目标</button>
+    <view wx:if="{{homeUnscopedCount}}" class="queue-note">{{homeUnscopedCount}} 条操作的账号归属尚未确认，暂不发送。</view>
+    <view wx:if="{{homeRecoveryMessage}}" class="queue-note">{{homeRecoveryMessage}}</view>
+  </view>
+</view>

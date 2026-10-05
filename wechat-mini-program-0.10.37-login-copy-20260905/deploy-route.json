@@ -1,0 +1,29 @@
+{
+  "domain": "*",
+  "routes": [
+    {
+      "path": "/desktop-sync",
+      "upstreamResourceType": "WEB_SCF",
+      "upstreamResourceName": "desktopSync",
+      "enable": true,
+      "enableAuth": false,
+      "enablePathTransmission": false
+    },
+    {
+      "path": "/wechat-webhook",
+      "upstreamResourceType": "WEB_SCF",
+      "upstreamResourceName": "wechatWebhook",
+      "enable": true,
+      "enableAuth": false,
+      "enablePathTransmission": false
+    },
+    {
+      "path": "/wechat-kf-webhook",
+      "upstreamResourceType": "WEB_SCF",
+      "upstreamResourceName": "wechatKfWebhook",
+      "enable": true,
+      "enableAuth": false,
+      "enablePathTransmission": false
+    }
+  ]
+}

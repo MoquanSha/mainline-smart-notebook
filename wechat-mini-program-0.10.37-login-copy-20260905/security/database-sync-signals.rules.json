@@ -1,0 +1,4 @@
+{
+  "read": "(auth.openid != null && doc.workspaceId == get(`database.sync_access.${auth.openid}`).activeWorkspaceId) || (auth.uid != null && doc.workspaceId == get(`database.sync_access.${auth.uid}`).activeWorkspaceId)",
+  "write": false
+}

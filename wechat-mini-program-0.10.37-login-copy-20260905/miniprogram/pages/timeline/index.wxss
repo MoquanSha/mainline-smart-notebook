@@ -1,0 +1,6 @@
+.redirect-page {
+  padding: 96rpx 40rpx;
+  color: #747782;
+  font-size: 28rpx;
+  text-align: center;
+}
